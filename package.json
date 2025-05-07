@@ -1,0 +1,13 @@
+{
+  "name": "kick-giveaway-listener",
+  "version": "1.0.0",
+  "description": "Kick chat listener that sends entrants to giveaway spinner.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.3.8",
+    "ws": "^8.13.0"
+  }
+}

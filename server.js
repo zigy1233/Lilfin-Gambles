@@ -1,59 +1,40 @@
 const WebSocket = require('ws');
-const puppeteer = require('puppeteer');
+const http = require('http');
+const Kick = require('kick-chat'); // <--- this is the magic!
 
-const KEYWORD = '!bless'; // Customize this
-const KICK_CHANNEL = 'https://kick.com/lilfin'; // Replace with your actual Kick channel name
-const WEBSOCKET_PORT = 8080;
+let entrants = new Set();
+let keyword = 'bless'; // match with the input on your website
 
-const entrants = new Set();
-const clients = [];
+// Create HTTP + WebSocket server
+const server = http.createServer();
+const wss = new WebSocket.Server({ server });
 
-const wss = new WebSocket.Server({ port: WEBSOCKET_PORT }, () =>
-  console.log(`✅ WebSocket running on ws://localhost:${WEBSOCKET_PORT}`)
-);
-
-wss.on('connection', (ws) => {
-  clients.push(ws);
-  ws.send(JSON.stringify({ type: 'entrants', names: [...entrants] }));
+wss.on('connection', ws => {
+  console.log('Frontend connected');
+  ws.send(JSON.stringify({ type: 'entrants', names: Array.from(entrants) }));
 });
 
-function broadcastEntrants() {
-  const message = JSON.stringify({ type: 'entrants', names: [...entrants] });
-  clients.forEach((ws) => {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(message);
-    }
-  });
-}
+// Connect to your Kick channel
+const client = new Kick.ChatClient('LILFIN'); // your Kick username
 
-(async () => {
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
+client.on('message', (msg) => {
+  const user = msg.sender.username;
+  const message = msg.content;
 
-  const url = `https://kick.com/${KICK_CHANNEL}`;
-  await page.goto(url, { waitUntil: 'networkidle2' });
+  console.log(`${user}: ${message}`);
 
-  await page.exposeFunction('onChatMessage', ({ username, message }) => {
-    if (message.toLowerCase().includes(KEYWORD.toLowerCase()) && !entrants.has(username)) {
-      console.log(`✅ Added entrant: ${username}`);
-      entrants.add(username);
-      broadcastEntrants();
-    }
-  });
+  if (message.toLowerCase().includes(keyword)) {
+    entrants.add(user);
 
-  await page.evaluate(() => {
-    const observer = new MutationObserver(() => {
-      document.querySelectorAll('.chat-message').forEach((el) => {
-        const username = el.querySelector('.chat-user-username')?.innerText;
-        const message = el.querySelector('.chat-message-text')?.innerText;
-        if (username && message) {
-          window.onChatMessage({ username, message });
-        }
-      });
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: 'entrants', names: Array.from(entrants) }));
+      }
     });
+  }
+});
 
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
-
-  console.log(`👀 Listening to chat at ${url}`);
-})();
+client.connect();
+server.listen(8080, () => {
+  console.log('✅ Server running at http://localhost:8080');
+});
