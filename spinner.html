@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Giveaway Spinner - LILFIN</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="spinner">
+  <nav class="navbar">
+    <div class="brand">LILFIN</div>
+    <div class="nav-links">
+      <a href="index.html">Welcome</a>
+      <a href="spinner.html">Giveaway Spinner</a>
+    </div>
+  </nav>
+
+  <section class="spinner-content">
+    <h2>🎯 Giveaway Spinner</h2>
+    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+
+    <div class="controls">
+      <input id="keyword" type="text" placeholder="Keyword (e.g. !enter)" />
+      <button onclick="startListening()">Start Listening</button>
+      <button onclick="spinWheel()" class="spin">🎉 Roll Winner</button>
+    </div>
+
+    <div class="entrants">
+      <h3>Current Entrants:</h3>
+      <ul id="entrantList"></ul>
+    </div>
+  </section>
+
+  <script src="spinner.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
