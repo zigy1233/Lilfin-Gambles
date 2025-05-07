@@ -1,33 +1,95 @@
-const entrants = [];
+const entrantListElement = document.getElementById("entrantList");
+let entrants = [];
+let ws;
+let wheelCanvas = document.getElementById("wheelCanvas");
+let ctx = wheelCanvas.getContext("2d");
+let spinning = false;
 
-function drawWheel() {
-  const canvas = document.getElementById("wheelCanvas");
-  const ctx = canvas.getContext("2d");
-  const arcSize = (2 * Math.PI) / entrants.length;
+function startListening() {
+  const keyword = document.getElementById("keyword").value.trim().toLowerCase();
+  if (!keyword) {
+    alert("Please enter a keyword.");
+    return;
+  }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ws = new WebSocket("ws://localhost:8080");
 
-  entrants.forEach((name, i) => {
-    const angle = i * arcSize;
-    ctx.beginPath();
-    ctx.moveTo(250, 250);
-    ctx.arc(250, 250, 200, angle, angle + arcSize);
-    ctx.fillStyle = `hsl(${i * (360 / entrants.length)}, 100%, 50%)`;
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "white";
-    ctx.fillText(name, 250 + Math.cos(angle + arcSize / 2) * 100, 250 + Math.sin(angle + arcSize / 2) * 100);
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "entrants") {
+      entrants = data.names;
+      updateEntrantList();
+      drawWheel();
+    }
+  };
+
+  ws.onerror = () => alert("WebSocket error. Make sure server.js is running.");
+}
+
+function updateEntrantList() {
+  entrantListElement.innerHTML = "";
+  entrants.forEach(name => {
+    const li = document.createElement("li");
+    li.textContent = name;
+    entrantListElement.appendChild(li);
   });
 }
 
-function spinWheel() {
-  if (entrants.length === 0) return alert("No entrants yet!");
-  const winner = entrants[Math.floor(Math.random() * entrants.length)];
-  alert(`🎉 The winner is: ${winner}!`);
+function drawWheel() {
+  const total = entrants.length;
+  if (total === 0) return;
+
+  const radius = wheelCanvas.width / 2;
+  const angle = (2 * Math.PI) / total;
+
+  ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+
+  for (let i = 0; i < total; i++) {
+    const start = i * angle;
+    const end = start + angle;
+
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, start, end);
+    ctx.fillStyle = i % 2 === 0 ? "#00ff88" : "#008866";
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.rotate(start + angle / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#000";
+    ctx.font = "16px Arial";
+    ctx.fillText(entrants[i], radius - 10, 10);
+    ctx.restore();
+  }
 }
 
-function updateEntrants() {
-  const list = document.getElementById("entrantList");
-  list.innerHTML = entrants.map(name => `<li>${name}</li>`).join("");
-  drawWheel();
+function spinWheel() {
+  if (spinning || entrants.length === 0) return;
+
+  spinning = true;
+  const total = entrants.length;
+  const winnerIndex = Math.floor(Math.random() * total);
+  const degreesPerSlice = 360 / total;
+  const stopAngle = 360 * 5 + (winnerIndex * degreesPerSlice) + (degreesPerSlice / 2);
+
+  let angle = 0;
+  const interval = setInterval(() => {
+    ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+    ctx.save();
+    ctx.translate(wheelCanvas.width / 2, wheelCanvas.height / 2);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.translate(-wheelCanvas.width / 2, -wheelCanvas.height / 2);
+    drawWheel();
+    ctx.restore();
+
+    angle += 10;
+    if (angle >= stopAngle) {
+      clearInterval(interval);
+      spinning = false;
+      alert(`🎉 Winner: ${entrants[winnerIndex]}!`);
+    }
+  }, 30);
 }

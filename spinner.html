@@ -3,15 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <title>Giveaway Spinner - LILFIN</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px 0;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .navbar a:hover {
+      color: #00ff88;
+    }
+
+    .spinner-content {
+      margin-top: 30px;
+    }
+
+    canvas {
+      background-color: #222;
+      border-radius: 50%;
+      margin-top: 20px;
+    }
+
+    .controls {
+      margin-top: 30px;
+    }
+
+    .controls input {
+      padding: 10px;
+      font-size: 1rem;
+      width: 200px;
+      margin-right: 10px;
+    }
+
+    .controls button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin-right: 10px;
+      cursor: pointer;
+      background-color: #00ff88;
+      border: none;
+      color: black;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+
+    .entrants {
+      margin-top: 30px;
+    }
+
+    #entrantList {
+      list-style: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #entrantList li {
+      padding: 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
 </head>
-<body class="spinner">
+<body>
   <nav class="navbar">
-    <div class="brand">LILFIN</div>
-    <div class="nav-links">
-      <a href="index.html">Welcome</a>
-      <a href="spinner.html">Giveaway Spinner</a>
-    </div>
+    <a href="index.html">Home</a>
+    <a href="spinner.html">IMA BLESS</a>
   </nav>
 
   <section class="spinner-content">
@@ -19,9 +93,9 @@
     <canvas id="wheelCanvas" width="500" height="500"></canvas>
 
     <div class="controls">
-      <input id="keyword" type="text" placeholder="Keyword (e.g. !enter)" />
+      <input id="keyword" type="text" placeholder="Keyword (e.g. !bless)" />
       <button onclick="startListening()">Start Listening</button>
-      <button onclick="spinWheel()" class="spin">🎉 Roll Winner</button>
+      <button onclick="spinWheel()">🎉 Roll Winner</button>
     </div>
 
     <div class="entrants">
@@ -30,7 +104,102 @@
     </div>
   </section>
 
-  <script src="spinner.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const entrantListElement = document.getElementById("entrantList");
+    let entrants = [];
+    let ws;
+    let wheelCanvas = document.getElementById("wheelCanvas");
+    let ctx = wheelCanvas.getContext("2d");
+    let spinning = false;
+
+    function startListening() {
+      const keyword = document.getElementById("keyword").value.trim().toLowerCase();
+      if (!keyword) {
+        alert("Please enter a keyword.");
+        return;
+      }
+
+      ws = new WebSocket("ws://localhost:8080");
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "entrants") {
+          entrants = data.names;
+          updateEntrantList();
+          drawWheel();
+        }
+      };
+
+      ws.onerror = () => alert("WebSocket error. Make sure server.js is running.");
+    }
+
+    function updateEntrantList() {
+      entrantListElement.innerHTML = "";
+      entrants.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        entrantListElement.appendChild(li);
+      });
+    }
+
+    function drawWheel() {
+      const total = entrants.length;
+      if (total === 0) return;
+
+      const radius = wheelCanvas.width / 2;
+      const angle = (2 * Math.PI) / total;
+
+      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+
+      for (let i = 0; i < total; i++) {
+        const start = i * angle;
+        const end = start + angle;
+
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, start, end);
+        ctx.fillStyle = i % 2 === 0 ? "#00ff88" : "#008866";
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(start + angle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
+        ctx.font = "16px Arial";
+        ctx.fillText(entrants[i], radius - 10, 10);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (spinning || entrants.length === 0) return;
+
+      spinning = true;
+      const total = entrants.length;
+      const winnerIndex = Math.floor(Math.random() * total);
+      const degreesPerSlice = 360 / total;
+      const stopAngle = 360 * 5 + (winnerIndex * degreesPerSlice) + (degreesPerSlice / 2);
+
+      let angle = 0;
+      const interval = setInterval(() => {
+        ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+        ctx.save();
+        ctx.translate(wheelCanvas.width / 2, wheelCanvas.height / 2);
+        ctx.rotate((angle * Math.PI) / 180);
+        ctx.translate(-wheelCanvas.width / 2, -wheelCanvas.height / 2);
+        drawWheel();
+        ctx.restore();
+
+        angle += 10;
+        if (angle >= stopAngle) {
+          clearInterval(interval);
+          spinning = false;
+          alert(`🎉 Winner: ${entrants[winnerIndex]}!`);
+        }
+      }, 30);
+    }
+  </script>
 </body>
 </html>
