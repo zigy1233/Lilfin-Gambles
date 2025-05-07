@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Welcome to LILFIN's Stream</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('May 7, 2025, 07_29_58 PM.png') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Top and bottom bars */
+    .top-bar,
+    .bottom-bar {
+      position: fixed;
+      width: 100%;
+      height: 70px;
+      background-color: rgba(0, 0, 0, 0.5);
+      left: 0;
+      z-index: 5;
+    }
+
+    .top-bar {
+      top: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .bottom-bar {
+      bottom: 0;
+    }
+
+    .top-bar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .top-bar a:hover {
+      color: #00ff88;
+    }
+
+    /* Profile Picture */
+    .profile-picture {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    .profile-picture img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #00ff88;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Title + socials container */
+    .title-box {
+      position: absolute;
+      top: 260px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      padding: 20px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 9;
+    }
+
+    .center-title {
+      display: flex;
+      gap: 10px;
+      font-size: 4rem;
+      font-weight: bold;
+      color: #00ff88;
+    }
+
+    .center-title span {
+      display: inline-block;
+      animation: jump 1.2s infinite ease-in-out;
+    }
+
+    .center-title span:nth-child(1) { animation-delay: 0s; }
+    .center-title span:nth-child(2) { animation-delay: 0.1s; }
+    .center-title span:nth-child(3) { animation-delay: 0.2s; }
+    .center-title span:nth-child(4) { animation-delay: 0.3s; }
+    .center-title span:nth-child(5) { animation-delay: 0.4s; }
+    .center-title span:nth-child(6) { animation-delay: 0.5s; }
+
+    @keyframes jump {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .social-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .social-button img {
+      height: 60px;
+      border-radius: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .social-button img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Roobet Promo Panel (fixed) */
+    .roobet-promo {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9;
+      text-align: center;
+    }
+
+    .roobet-promo a {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .roobet-promo img {
+      width: 240px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease;
+    }
+
+    .roobet-promo img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Footer */
+    .footer {
+      width: 100%;
+      text-align: center;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.4);
+      padding: 20px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      position: fixed;
+      bottom: 0;
+    }
+
+    @media (max-width: 600px) {
+      .center-title {
+        font-size: 3rem;
+      }
+      .social-button img {
+        height: 50px;
+      }
+      .roobet-promo img {
+        width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Bar with Nav -->
+  <div class="top-bar">
+    <a href="index.html">Home</a>
+    <a href="spinner.html">IMA BLESS</a>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar"></div>
+
+  <!-- Profile Picture -->
+  <div class="profile-picture">
+    <img src="bcffc94e-d08d-469d-a390-2e6e9b83c32b-fullsize.webp" alt="Profile Picture" />
+  </div>
+
+  <!-- LILFIN Title + Socials -->
+  <div class="title-box">
+    <div class="center-title">
+      <span>L</span>
+      <span>I</span>
+      <span>L</span>
+      <span>F</span>
+      <span>I</span>
+      <span>N</span>
+    </div>
+    <div class="social-buttons">
+      <a href="https://kick.com/lilfin" target="_blank" class="social-button">
+        <img src="Kick_29.webp" alt="Watch on Kick" />
+      </a>
+      <a href="https://www.youtube.com/channel/UCVOcKlo1suzFHCmb45d-uUA" target="_blank" class="social-button">
+        <img src="youtube-logo-youtube-logo-transparent-youtube-icon-transparent-free-free-png.webp" alt="Watch on YouTube" />
+      </a>
+      <a href="https://discord.gg/7Kfm4ySC" target="_blank" class="social-button">
+        <img src="discord-icon-isolated-white-background-social-media-app-button-logo-sign-symbol-front-view_989822-4786.avif" alt="Join Discord" />
+      </a>
+    </div>
+  </div>
+
+  <!-- Roobet Promo Panel -->
+  <div class="roobet-promo">
+    <a href="https://roobet.com/?ref=lilfin2" target="_blank">
+      <img src="ChatGPT Image May 7, 2025, 07_05_59 PM.png" alt="Sign up with LILFIN2 on Roobet" />
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    LILFIN Gambles © 2025
+  </div>
+</body>
+</html>
